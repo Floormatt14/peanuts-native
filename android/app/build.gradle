@@ -93,7 +93,7 @@ def shaderInputsOf = { String game -> try { def r = providers.exec { commandLine
 // shaders/v-<V>/inputs.tsv names it, as pack_android.py's library_current asks; "unknown" without a Python 3 at build time: the launcher then checks the library's path
 // only), and the profile's builds (game.tsv build rows: version, then module=NSO build ID, ';' between builds), which the on-device job checks a dump against
 // then the readiness check's rows (the profile's readiness.tsv: required / degraded rows as level|fact|min|what, ';' between them; Readiness.java) and the game's status
-// on Android (its status row: playable / bring-up)
+// on Android (its status row: playable / wip / boots / bring-up, and the `tested` row that backs playable and wip)
 def readinessRows = { String game -> def t = new File(repo, "dm/games/$game/readiness.tsv"); t.isFile() ? t.readLines().findAll { it.trim() && !it.startsWith('#') }.collect { it.split('\t') } : [] }
 def reqText = { String s -> s.replaceAll(/[\t\n\\"]/, ' ').replaceAll(/[;|]/, ',').trim() }
 def reqsOf = { String game -> readinessRows(game).findAll { it.size() >= 4 && it[0] in ['required', 'degraded'] }.collect { c -> (c.take(3) + [c.drop(3).join(' ')]).collect { reqText(it) }.join('|') }.join(';') }

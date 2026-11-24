@@ -266,7 +266,7 @@ def host_rows(builds):   # {build ID: [(file, line, what)]}: rows and checks of 
     for p in sorted(REPO / f for f in set(tracked) if f):   # a set: ls-files lists a file in a merge conflict once per stage
         if p.suffix not in HOST_EXT or 'tests' in p.relative_to(REPO).parts[2:]: continue
         table = None
-        for n, line in enumerate(p.read_text(errors='replace').split('\n'), 1):
+        for n, line in enumerate(p.read_text(encoding='utf-8', errors='replace').split('\n'), 1):
             m = re.search(r'\b(k_\w+)\s*\[\]\s*=', line)
             if m: table = m.group(1)
             if line.lstrip().startswith('}'): table = None
@@ -284,7 +284,7 @@ def host_rows(builds):   # {build ID: [(file, line, what)]}: rows and checks of 
 def shader_rules():   # (file, line, comment) of translator rules keyed by a shader's code hash (64-hex literals in the C# tools)
     out = []
     for p in sorted((REPO / 'dm/gfx/tools').rglob('*.cs')):
-        lines = p.read_text(errors='replace').split('\n')
+        lines = p.read_text(encoding='utf-8', errors='replace').split('\n')
         for n, line in enumerate(lines, 1):
             if not re.search(r'"[0-9A-Fa-f]{64}"', line): continue
             k = n - 1
@@ -300,7 +300,7 @@ def shader_rules():   # (file, line, comment) of translator rules keyed by a sha
 
 
 def switches(gs):   # [(key, value, [games])] of every profile key set away from its default in game.py
-    src = (REPO / 'dm/games/game.py').read_text(); src = src[src.find('def header('):]; src = re.split(r'\n(?=\S)', src)[0]   # the keys the host's header takes (to the next top-level line)
+    src = (REPO / 'dm/games/game.py').read_text(encoding='utf-8'); src = src[src.find('def header('):]; src = re.split(r'\n(?=\S)', src)[0]   # the keys the host's header takes (to the next top-level line)
     defaults = {}
     for k, d in re.findall(r'g\.(?:get|words)\(\s*[\'"](\w+)[\'"]\s*,\s*[\'"]([^\'"]*)[\'"]\s*\)', src): defaults.setdefault(k, d)
     out = {}
@@ -328,7 +328,7 @@ def page():
     gs.sort(key=lambda g: name(g).casefold()); builds = build_rows(gs); host = host_rows(builds)
     files = {p.parent.name: p for p in sorted((REPO / 'dm/games').glob('*/patches.py'))}
     mods = {gid: load(p, n) for n, (gid, p) in enumerate(files.items())}
-    sdk = load(SDK, 'sdk'); sdk_text = SDK.read_text()
+    sdk = load(SDK, 'sdk'); sdk_text = SDK.read_text(encoding='utf-8')
     host_games = {}
     for bid, rows in host.items():
         for g, _, _ in builds.get(bid, []): host_games.setdefault(g.id, set()).add(bid)
@@ -349,7 +349,7 @@ def page():
     for g in gs:
         m = mods.get(g.id)
         if not m and g.id not in host_games: continue
-        text = files[g.id].read_text() if m else ''
+        text = files[g.id].read_text(encoding='utf-8') if m else ''
         cuts, obs, fs, mc, caps = (getattr(m, k, {}) for k in ('CUTS', 'OBS', 'FRAME_STEP', 'MATCH_CUTS', 'CAPABILITIES'))
         bids = list(dict.fromkeys([*cuts, *obs, *fs, *caps, *sorted(host_games.get(g.id, ()))]))
         n_fs = 0; lines = [f'### {name(g)}', '', f'{note(g)}, `{g.id}`' + (f', {link(files[g.id])}' if m else '') + '.', '']
@@ -478,7 +478,7 @@ def slug(h):
 if __name__ == '__main__':
     text = page()
     if '--check' in sys.argv[1:]:
-        if OUT.read_text() != text: sys.exit(f'{rel(OUT)} is out of date: run dm/tools/docs_patches.py')
+        if OUT.read_text(encoding='utf-8') != text: sys.exit(f'{rel(OUT)} is out of date: run dm/tools/docs_patches.py')
         print(f'{rel(OUT)} is current')
     else:
         OUT.write_text(text, newline='\n')   # PEANUTS(upstream-candidate): LF on every host (Windows' default translation wrote CR LF, a diff of every line)

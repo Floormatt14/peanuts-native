@@ -169,9 +169,13 @@ final class Readiness {
         return out;
     }
 
-    /** The game's status on Android (its readiness.tsv status row): a game in bring-up gets a warning of its own, whatever the phone has */
+    /** The game's status on Android (its readiness.tsv status row): the ladder of dm/games/README.md "Readiness rows", best first. A rung that is not `playable` says what it does and does not mean */
     static Check status(String status) {
         if (status == null || status.isEmpty() || status.equals("playable")) return null;
+        if (status.equals("wip"))
+            return new Check("Status on Android", Status.INFO, "This game is a work in progress: it plays, but parts of it are missing or wrong (the game's note says which).", null);
+        if (status.equals("boots"))
+            return new Check("Status on Android", Status.WARNING, "This game reaches its first scenes on Android and nothing more was played here: it may stop or draw wrongly anywhere, this phone included.", null);
         if (status.equals("bring-up"))
             return new Check("Status on Android", Status.WARNING, "This game is still being brought up on Android: it may stop or draw wrongly on any phone, this one included.", null);
         return new Check("Status on Android", Status.INFO, status, null);

@@ -9,3 +9,4 @@
 # pick Turnip in Settings > GPU driver: purple-turnip T30 (Mesa 26.3) is correct there, with the dungeon at 29-30 fps and GPU about 19 ms (Turnip Gen8 V39, an A8xx
 # build, also works, at GPU 28.8 ms). Qualcomm 512.800 (Adreno 830) is correct. No readiness fact names a driver version, so this is no row
 status	playable
+tested	v131072 OnePlus Pad 3 (Adreno 830) and AYN Thor (Adreno 740), date not recorded (before 2026-11-12)

@@ -15,6 +15,7 @@ TEST = REPO / 'android/app/src/jvmtest/java/dev/nxnative/android/ReadinessJvmTes
 PROBE = REPO / 'dm/gfx/vk_android/vka_readiness.c'
 FIXTURE = REPO / 'android/app/src/jvmtest/honor-pnm-n49.readiness.txt'   # the tested phone's facts on its own driver (nxhost_vk_readiness, 2026-11-03)
 VK_HEADER = REPO / 'dm/third_party/vulkan-headers/include/vulkan/vulkan_core.h'
+STATUSES = ('playable', 'wip', 'boots', 'bring-up')   # the ladder of dm/games/README.md "Readiness rows", best first
 
 
 def tables():
@@ -69,9 +70,9 @@ class Tables(unittest.TestCase):
         for t in tables():
             st = [c for c in rows(t) if c[0] == 'status']
             self.assertLessEqual(len(st), 1, f'{t}: one status row at most')
-            for c in st: self.assertIn(c[1].strip(), ('playable', 'bring-up'), f'{t}: status')
+            for c in st: self.assertIn(c[1].strip(), STATUSES, f'{t}: status')
             for c in rows(t):
-                if c[0] == 'status': continue
+                if c[0] in ('status', 'tested'): continue
                 self.assertIn(c[0], ('required', 'degraded'), f'{t}: {c}')
                 self.assertGreaterEqual(len(c), 4, f'{t}: {c}: level, fact, minimum, title')
                 self.assertIn(c[1], facts, f'{t}: {c[1]} is no fact the host or the launcher reports')

@@ -37,7 +37,7 @@ ANCHORS = {}
 def anchors(path):   # the anchors GitHub gives the headings of a Markdown file (repeated headings get -1, -2, …)
     if path not in ANCHORS:
         seen, out, fence = {}, set(), False
-        for line in path.read_text(errors='replace').split('\n'):
+        for line in path.read_text(encoding='utf-8', errors='replace').split('\n'):
             if line.startswith('```'): fence = not fence
             if fence: continue
             m = re.match(r'#{1,6}\s+(.*?)\s*#*$', line)
@@ -49,7 +49,7 @@ def anchors(path):   # the anchors GitHub gives the headings of a Markdown file 
 
 
 def links(path):   # (line number, target) of every inline link outside code
-    text = re.sub(r'```.*?```', lambda m: '\n' * m.group(0).count('\n'), path.read_text(errors='replace'), flags=re.S)
+    text = re.sub(r'```.*?```', lambda m: '\n' * m.group(0).count('\n'), path.read_text(encoding='utf-8', errors='replace'), flags=re.S)
     for n, line in enumerate(text.split('\n'), 1):
         line = re.sub(r'`[^`]*`', '', line)
         for m in re.finditer(r'\]\(([^)\s]+)(?:\s+"[^"]*")?\)', line):
@@ -74,7 +74,7 @@ class GameNotes(unittest.TestCase):
     def test_every_profile_has_a_note_and_a_row(self):
         games = REPO / 'dm/games'
         profiles = sorted(d.name for d in games.iterdir() if (d / 'game.tsv').is_file())
-        rows = set(re.findall(r'^\| \[[^\]]+\]\(([0-9A-F]{16})/README\.md\) \| `([0-9A-F]{16})`', (games / 'README.md').read_text(), re.M))
+        rows = set(re.findall(r'^\| \[[^\]]+\]\(([0-9A-F]{16})/README\.md\) \| `([0-9A-F]{16})`', (games / 'README.md').read_text(encoding='utf-8'), re.M))
         self.assertTrue(profiles)
         for g in profiles:
             self.assertTrue((games / g / 'README.md').is_file(), f'dm/games/{g} has no README.md (its game note)')
@@ -85,12 +85,12 @@ class GameNotes(unittest.TestCase):
 
 class SymptomIndex(unittest.TestCase):
     def test_index_is_current(self):
-        self.assertEqual(docs_symptoms.OUT.read_text(), docs_symptoms.index(), 'docs/agents/symptoms.md is out of date: run dm/tools/docs_symptoms.py')
+        self.assertEqual(docs_symptoms.OUT.read_text(encoding='utf-8'), docs_symptoms.index(), 'docs/agents/symptoms.md is out of date: run dm/tools/docs_symptoms.py')
 
 
 class PatchIndex(unittest.TestCase):
     def test_index_is_current(self):
-        self.assertEqual(docs_patches.OUT.read_text(), docs_patches.page(), 'docs/agents/game-patches.md is out of date: run dm/tools/docs_patches.py')
+        self.assertEqual(docs_patches.OUT.read_text(encoding='utf-8'), docs_patches.page(), 'docs/agents/game-patches.md is out of date: run dm/tools/docs_patches.py')
 
 
 class Gallery(unittest.TestCase):
@@ -176,13 +176,13 @@ class Gallery(unittest.TestCase):
 
 class Length(unittest.TestCase):
     def test_entry_points_stay_short(self):
-        words = lambda p: len(p.read_text().split())
+        words = lambda p: len(p.read_text(encoding='utf-8').split())
         self.assertLessEqual(words(REPO / 'AGENTS.md'), AGENTS_WORDS, 'AGENTS.md: put game facts in the game note, mechanisms in docs/reference')
         for p in sorted((REPO / 'docs/agents').glob('0*.md')):
             self.assertLessEqual(words(p), GUIDE_WORDS, f'{p.relative_to(REPO)}: put findings in docs/reference or the game notes')
 
     def test_agents_states_no_game_count(self):   # a count there was edited by most commits that touched the file, and conflicted between pull requests; the games table is the count
-        count = re.search(r'\b(\d+|(?:twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|one hundred)(?:-\w+)?)\s+(?:\w+\s+)?games\b', (REPO / 'AGENTS.md').read_text(), re.I)
+        count = re.search(r'\b(\d+|(?:twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|one hundred)(?:-\w+)?)\s+(?:\w+\s+)?games\b', (REPO / 'AGENTS.md').read_text(encoding='utf-8'), re.I)
         self.assertIsNone(count, f'AGENTS.md: {count and count.group(0)!r}: say "the games in the games table" instead of a number')
 
 

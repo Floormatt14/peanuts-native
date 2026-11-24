@@ -96,8 +96,11 @@ public final class ReadinessJvmTest {
         check(find(l, "GPU features").status == Readiness.Status.FAIL && find(l, "GPU features").message.contains("vkCreateInstance returned -9")
                 && find(l, "Vulkan 1.3 loader").status == Readiness.Status.PASS && Readiness.of(l, Readiness.Status.FAIL).size() == 1, "an error line: " + l);
 
-        // Status and the driver's environment
+        // Status and the driver's environment: the ladder's rungs, one message each (dm/games/README.md "Readiness rows")
         check(Readiness.status("playable") == null && Readiness.status("") == null && Readiness.status("bring-up").status == Readiness.Status.WARNING, "status");
+        check(Readiness.status("boots").status == Readiness.Status.WARNING && Readiness.status("boots").message.contains("first scenes")
+                && Readiness.status("wip").status == Readiness.Status.INFO && Readiness.status("wip").message.contains("work in progress")
+                && Readiness.status("nonsense").status == Readiness.Status.INFO, "status ladder");
         String[] de = Readiness.driverEnv(List.of("DM_SAVE=/x", "DM_VK_DRIVER=/d/turnip", "DM_VK_HOOKDIR=/h", "DM_VK_DRIVER=system"));
         check(de.length == 3 && de[0].equals("DM_VK_DRIVER=/d/turnip") && de[2].equals("DM_VK_DRIVER=system"), "driverEnv keeps the order (the last wins)");
         // The game's environment for the check (GitHub #40): every line but the paths start sets, in order; unknown DM_ names and the nearest switch

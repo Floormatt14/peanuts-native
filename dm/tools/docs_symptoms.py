@@ -17,12 +17,12 @@ def slug(h):
 
 def ref_files():
     # the reference files in the order of the table in docs/reference/README.md
-    return [REF / m for m in re.findall(r'^\| \[[^\]]+\]\(([a-z-]+\.md)\)', (REF / 'README.md').read_text(), re.M)]
+    return [REF / m for m in re.findall(r'^\| \[[^\]]+\]\(([a-z-]+\.md)\)', (REF / 'README.md').read_text(encoding='utf-8'), re.M)]
 
 def entries(path):
     # (heading, anchor, symptom) of each ### entry with a Symptom bullet; anchors numbered as GitHub numbers repeated headings
     seen, head, fence, out = {}, None, False, []
-    for line in path.read_text().split('\n'):
+    for line in path.read_text(encoding='utf-8').split('\n'):
         if line.startswith('```'): fence = not fence
         if fence: continue
         m = re.match(r'(#{1,6}) (.*?)\s*#*$', line)
@@ -45,14 +45,14 @@ def index():
     for p in ref_files():
         e = entries(p)
         if not e: continue
-        title = re.match(r'# (.*)', p.read_text()).group(1)
+        title = re.match(r'# (.*)', p.read_text(encoding='utf-8')).group(1)
         lines += [f'## {title}', ''] + [f'- {sym} → [{h}](../reference/{p.name}#{a})' for h, a, sym in e] + ['']
     return '\n'.join(lines).rstrip() + '\n'
 
 if __name__ == '__main__':
     text = index()
     if '--check' in sys.argv[1:]:
-        if OUT.read_text() != text: sys.exit(f'{OUT.relative_to(REPO)} is out of date: run dm/tools/docs_symptoms.py')
+        if OUT.read_text(encoding='utf-8') != text: sys.exit(f'{OUT.relative_to(REPO)} is out of date: run dm/tools/docs_symptoms.py')
         print(f'{OUT.relative_to(REPO)} is current')
     else:
         OUT.write_text(text, encoding='utf-8', newline='\n')   # PEANUTS(upstream-candidate): LF on Windows too (it wrote CR LF there, every line a change)

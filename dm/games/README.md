@@ -369,7 +369,8 @@ One row per profile; the notes are each profile's `README.md`.
 
 | Row | Meaning |
 |---|---|
-| `status <playable\|bring-up>` | The game's state on Android. `bring-up` shows a warning on every phone (it may stop or draw wrongly anywhere). The row also marks the game as supported on Android: `android/app/gradle.properties`' `nxGames`, the games every APK built without `-PnxGames` carries, is exactly these profiles (`dm/tools/tests/test_android_games.py`) |
+| `status <playable\|wip\|boots\|bring-up>` | The game's state on Android, one rung of four, and what the Readiness check screen says of it: `playable`, played on a phone through its menus, a save and its gameplay, with nothing known wrong (no notice); `wip`, it plays but parts of it are missing or wrong, named in its note (a note, not a warning); `boots`, it reached its frame loop and its first scenes on a phone and nothing more was played (a warning); `bring-up`, it may stop or draw wrongly anywhere (a warning). The row also marks the game as supported on Android: `android/app/gradle.properties`' `nxGames`, the games every APK built without `-PnxGames` carries, is exactly these profiles (`dm/tools/tests/test_android_games.py`) |
+| `tested <version> <device> (<date>)` | What was played, where and when, as the game's note records it: the game's version as the profile names it, the phone(s) and driver, the date. Required for `playable` and `wip` (`dm/tools/tests/test_android_games.py`): a rung is a claim, and this is its evidence. A phone whose model was not recorded says so there rather than being left out |
 | `required <fact> <at least> <title>: <why>` | Without it the game does not run, stops, or draws nothing of what needs it: the start shows **This phone lacks what this game needs** with **Try anyway** |
 | `degraded <fact> <at least> <title>: <why>` | The game runs without it, with something missing or at lower detail: a notice the player can turn off |
 

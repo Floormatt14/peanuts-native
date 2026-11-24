@@ -3,6 +3,7 @@
 # A table of its own, not game.tsv rows: the launcher's rows apart from the host's (a pack's rewrite key hashes only game.tsv's build rows, pack_android.py rewrite_key).
 
 status	playable
+tested	v458752 Honor PNM-N49 (Adreno 840), 2026-11-02
 
 # Memory: 6.3-8.1 GB resident while playing on the 16 GB phone (14.66 GiB totalMem), the note's Memory section; no phone with less has run it
 required	ram_gib	10	Memory: the game keeps 6-8 GB in use while playing, which a phone with less than about 12 GB cannot give it

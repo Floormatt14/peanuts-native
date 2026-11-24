@@ -4,3 +4,4 @@
 # Playable on Android (user, 2026-11-15): boots and reaches its first scenes on the system driver and on Turnip (the note, Status on Android). Upstream measured about 8.5 GB
 # resident on the Mac, so phones with less memory may not hold it; no memory row until a phone run measures it
 status	playable
+tested	v131072 a player's phone (model not recorded), 2026-11-15

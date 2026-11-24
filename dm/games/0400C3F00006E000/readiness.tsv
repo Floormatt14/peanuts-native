@@ -4,6 +4,7 @@
 
 # Playable on the tested 16 GB phone (the user's check, 2026-11-08); Supported on the player pages
 status	playable
+tested	1.8.0 Honor PNM-N49 (Adreno 840), 2026-11-08
 
 # Memory: plays on the 16 GB phone (14.66 GiB totalMem; earlier builds were stopped there by the low-memory killer about 20 s in, the note); nothing less has run it
 required	ram_gib	14	Memory: the game needs a 16 GB phone (14 GiB reported); 12 GB phones run out of memory

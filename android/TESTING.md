@@ -82,6 +82,34 @@ The screen stays black with the last log lines at the bottom. Give it a minute: 
 
 **In-game panel with a controller.** Mid-game, press Home or hold − and + for half a second (Settings › Controller: in-game panel): the panel opens with a yellow frame on its first row and the game stops getting the controller (a button or stick held while it opened is released, nothing stays pressed). The D-pad or the left stick moves the frame (held: it repeats), left / right change a slider or a radio group, A presses, L / R switch tabs (Performance, Display, Controls, General), B closes it. By touch the panel opens with a swipe in from the right edge or Back; a hint says so once per install.
 
+## Before calling a run done
+
+A run that reaches gameplay is not a game that is ready, and a port that installed is not a boot that works. These four checks separate the two; they come from a sibling port loop's own post-mortem, where a pass once reported "still running" off a log 40 minutes stale. They are for the end of a bring-up round, not for every quick run; a quick run's bar is in [Fast test runs](#fast-test-runs).
+
+1. **The artifact is the one you measured.** The hash of the built `.so` against the one inside the installed APK, and the version read off the device rather than off the profile:
+   ```sh
+   unzip -p <apk> lib/arm64-v8a/libnxhost_<id>.so | sha256sum          # what was built
+   adb shell pm path dev.nxnative.android | sed 's/package://'          # then pull that base.apk and hash the same member
+   adb shell dumpsys package dev.nxnative.android | grep -m2 -E 'versionName|versionCode'
+   ```
+2. **The data is complete, counted, not assumed.** A truncated pack looks exactly like a working one until a scene it lacks loads. Count what went over against what is there, files and total size:
+   ```sh
+   du -sk <pack folder>; find <pack folder> -type f | wc -l                    # here
+   adb shell "cd '<pack on the phone>' && du -sk . && find . -type f | wc -l"   # there
+   ```
+3. **Input, not just output.** The pause menu opens with Back or a controller's Home, one row changes a setting, and a save is written and loaded again. A game that draws but ignores its pad is a demo, not a feature.
+4. **The whole log is clean**, not its tail: `grep -aE '\[RED\]|CRASH sig=|thread dump' <log>` over the file, and `python3 scripts/log_digest.py <log>` for the verdict. The interesting line is usually a few hundred lines above the failure.
+
+### A soak
+
+A bring-up round that ends with the game `playable` or `wip` closes with a 30-minute soak on the build being handed over: the same process id throughout, frames still advancing, no new `[RED]` line. Camera moves only, so a save's story does not advance:
+
+```sh
+android/tools/nxsoak.sh 30 [title id]     # a line a minute, then OK or FAILED with what broke
+```
+
+It fails on a restart, a new log, one new `[RED]` line, two minutes without a new frame (a spin passes a liveness-only test but is no scene), or the phone running out of space; it says who ended the process when logcat knows; and it exits 2 rather than 0 when it could not measure (no adb, no device, no log, the app not in the foreground). A fail that a player could hit is the next bug, not a flaked soak. The result belongs in the game's note (what ran, on which driver, for how long), and the rung the game earns (`playable`, `wip`, `boots`, `bring-up`: [the ladder](../dm/games/README.md#readiness-rows)) goes in its `readiness.tsv` with the `tested` row that backs it.
+
 ## 7. Send the log back
 
 Tap **Share log** in the game list (it sends the newest run's log), or pull every log:

@@ -3,3 +3,4 @@
 
 # Playable (the user's check, 2026-11-07/08: sky correct, Pokedex images, plays fine); Supported on the player pages. Open: the Qualcomm driver's stall before the first Poke Ball (the note, Android)
 status	playable
+tested	v655360 Samsung Galaxy S25 Ultra (Adreno 830), 2026-11-05
